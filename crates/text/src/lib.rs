@@ -705,6 +705,10 @@ fn measure_str(face: &FontFace, size: f64, s: &str) -> (f64, Vec<(u32, f64)>) {
 /// Single line spacing as a multiple of the font size. PowerPoint spaces single-spaced lines 1.2
 /// times the size apart in every font (observed on twenty Latin, CJK, Thai and Indic fonts at 18
 /// and 40 pt), whatever the font's own ascent and descent.
+///
+/// Caveat: this was measured on one Windows install of desktop PowerPoint. It may be a Windows or
+/// machine setting; PowerPoint on macOS or the web may space lines by the font's own metrics.
+/// Keep it a single tunable value, and re-measure on the other platform before changing it.
 const LINE_PITCH: f64 = 1.2;
 
 /// A line's height above and below the baseline at `size`: [`LINE_PITCH`] × size, split where
