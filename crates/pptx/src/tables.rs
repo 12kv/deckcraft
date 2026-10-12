@@ -47,6 +47,12 @@ fn own_guid(style: &str) -> String {
     guid(&format!("deckcraft-table-style:{style}"))
 }
 
+/// Is `g` the GUID DeckCraft writes for one of its own styles?
+pub fn is_own_guid(g: &str) -> bool {
+    let up = g.to_ascii_uppercase();
+    deckcraft_model::table::table_styles().iter().any(|(id, _)| own_guid(id) == up)
+}
+
 /// Table style GUID → our style id (or the GUID itself when unknown).
 pub fn style_from_guid(g: &str) -> String {
     let up = g.to_ascii_uppercase();
