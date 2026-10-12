@@ -779,7 +779,7 @@ fn break_opportunities(text: &str, latin_break: bool) -> (Vec<bool>, Vec<bool>) 
     let chars: Vec<char> = text.chars().collect();
     for (i, w) in chars.windows(2).enumerate() {
         let (prev, next) = (w[0], w[1]);
-        let keep = if is_hangul(prev) && is_hangul(next) { false } else { latin_break || !(matches!(prev, '/' | '\\') && !next.is_whitespace()) };
+        let keep = if is_hangul(prev) && is_hangul(next) { false } else { latin_break || !matches!(prev, '/' | '\\') || next.is_whitespace() };
         if !keep
             && !mandatory.get(i + 1).copied().unwrap_or(false)
             && let Some(a) = allowed.get_mut(i + 1)
