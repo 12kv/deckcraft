@@ -119,9 +119,10 @@ fn effects_tables_charts_render() {
     all.extend(charts);
     let p = deck_with(all);
     let img = render_slide(&p, 0, &RenderOpts { scale: 1.0, ..Default::default() });
-    // Shadow darkens below-right of the shape.
-    let px = img.pixel(258, 156);
-    assert!(px[0] < 250, "{px:?}");
+    // Shadow darkens below-right of the shape (grey, past the glow), blurred by a third of its
+    // 8 pt blur radius.
+    let px = img.pixel(255, 155);
+    assert!(px[0] < 240 && px[0] == px[2], "{px:?}");
 }
 
 #[test]
