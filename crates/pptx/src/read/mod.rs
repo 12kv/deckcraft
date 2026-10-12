@@ -513,6 +513,7 @@ fn walk_shapes_mut(shapes: &mut [deckcraft_model::Shape], f: &mut dyn FnMut(&mut
             walk_shapes_mut(children, f);
         }
     }
+}
 
 /// `a:tblStyleLst`: the table styles the file defines.
 fn table_styles(imp: &mut Imp, part: &Part, root: &El) -> Vec<deckcraft_model::table::TableStyleDef> {
