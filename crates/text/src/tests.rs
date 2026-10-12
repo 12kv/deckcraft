@@ -500,7 +500,7 @@ fn single_spaced_lines_are_1_2_times_the_size_apart_whatever_the_font() {
         let (p, mut sh) = bidi_setup(vec![run], 2000.0, false, Align::Left);
         let t = sh.text.as_mut().unwrap();
         t.body.autofit = Some(AutoFit::None);
-        let mut second = t.paragraphs[0].clone();
+        let second = t.paragraphs[0].clone();
         t.paragraphs.push(second.clone());
         t.paragraphs.push(second);
         for para in &mut t.paragraphs {
