@@ -198,8 +198,9 @@ fn style_def(w: &mut W, id: &str, name: &str) {
     w.close("a:tblStyle");
 }
 
-/// `ppt/tableStyles.xml` with definitions for the styles in `used`.
-pub fn table_styles_xml(used: &[String]) -> Vec<u8> {
+/// `ppt/tableStyles.xml` with definitions for the styles in `used`: ours, generated, and those the
+/// opened file defined (`defs`), written back as they were read.
+pub fn table_styles_xml(used: &[String], defs: &[deckcraft_model::table::TableStyleDef]) -> Vec<u8> {
     let mut w = W::new();
     w.open("a:tblStyleLst", A::new().a("xmlns:a", NS_A).a("def", "{5C22544A-7EE6-4342-B048-85BDC9FD1C3A}"));
     let names = deckcraft_model::table::table_styles();
@@ -209,6 +210,12 @@ pub fn table_styles_xml(used: &[String]) -> Vec<u8> {
             continue;
         }
         done.push(s);
+        if let Some(d) = defs.iter().find(|d| d.id.eq_ignore_ascii_case(s))
+            && crate::xml::parse(d.raw.as_bytes()).is_ok_and(|x| x.root.is("tblStyle"))
+        {
+            w.raw(&d.raw);
+            continue;
+        }
         let (_, define) = guid_for_style(s);
         if !define {
             continue;
@@ -231,7 +238,7 @@ mod tests {
             "nwCell",
         ];
         let used: Vec<String> = deckcraft_model::table::table_styles().into_iter().map(|(id, _)| id).collect();
-        let d = crate::xml::parse(&table_styles_xml(&used)).unwrap();
+        let d = crate::xml::parse(&table_styles_xml(&used, &[])).unwrap();
         let mut n = 0;
         for st in d.root.children_named("tblStyle") {
             n += 1;
