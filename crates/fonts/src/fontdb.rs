@@ -87,6 +87,14 @@ fn office_twin(family: &str) -> Option<&'static str> {
     })
 }
 
+/// Office's downloadable (cloud) families: PowerPoint fetches them when a document uses them, so
+/// they draw as themselves there, not as Calibri. Without them DeckCraft keeps their closest open
+/// substitute ([`substitutes`]; Aptos as Inter).
+fn is_office_cloud_font(family: &str) -> bool {
+    let f = family.to_ascii_lowercase();
+    f.starts_with("aptos") || ["bierstadt", "grandview", "seaford", "skeena", "tenorite"].iter().any(|c| f.starts_with(c))
+}
+
 /// The family PowerPoint draws a document's Latin text in when the font it names isn't installed,
 /// whatever the theme, `panose` or `pitchFamily` say.
 pub const MISSING_FONT_FAMILY: &str = "Calibri";
@@ -831,7 +839,7 @@ impl FontDb {
     /// see `office_twin`); any other missing family is drawn in Calibri (or Carlito).
     /// DeckCraft's own default family keeps [`FontDb::face`]'s fallbacks.
     pub fn document_face(&self, family: &str, style: &str) -> Arc<FontFace> {
-        if family.eq_ignore_ascii_case(FALLBACK_FAMILY) || has_metric_twin(family) || self.has_family(family) {
+        if family.eq_ignore_ascii_case(FALLBACK_FAMILY) || has_metric_twin(family) || is_office_cloud_font(family) || self.has_family(family) {
             return self.face(family, style);
         }
         if let Some(twin) = office_twin(family) {

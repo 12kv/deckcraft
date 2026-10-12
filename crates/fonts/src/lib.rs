@@ -237,7 +237,8 @@ mod tests {
             }
         }
         // Metric-compatible stand-ins and DeckCraft's default keep their own fallbacks.
-        for kept in ["Arial", "Times New Roman", "Cambria", "Courier New", FALLBACK_FAMILY] {
+        // So do Office's cloud fonts, which PowerPoint downloads and draws as themselves.
+        for kept in ["Arial", "Times New Roman", "Cambria", "Courier New", FALLBACK_FAMILY, "Aptos", "Aptos Display", "Grandview"] {
             assert_eq!(db.document_face(kept, "Regular").family, db.face(kept, "Regular").family, "{kept}");
         }
     }
