@@ -451,7 +451,7 @@ fn line_split(f: &skrifa::FontRef, ascent: f64, descent: f64, upem: f64) -> f64 
         _ => (ascent, descent),
     };
     let total = a + d;
-    if !(total > 0.0) || !a.is_finite() || !d.is_finite() || a < 0.0 || d < 0.0 {
+    if !total.is_finite() || total <= 0.0 || a < 0.0 || d < 0.0 {
         return 0.8;
     }
     if total > upem * 1.5 { 0.81 } else { (a / total).clamp(0.5, 1.0) }
