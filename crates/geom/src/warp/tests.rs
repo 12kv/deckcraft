@@ -228,6 +228,15 @@ fn deflate_inflate_maps_each_band_separately() {
     assert!((m.map(0, Point::new(100.0, 40.0)).y / H - 0.45).abs() < 0.004);
     assert!((m.map(1, Point::new(100.0, 50.0)).y / H - 0.55).abs() < 0.004);
     assert!((m.map(1, Point::new(300.0, 80.0)).y / H - 1.0).abs() < 0.004);
+    // A band with fewer lines keeps them at the size of the fuller band, centred in its band:
+    // two lines (ink 10..60) in band 1, one line (ink 70..80) in band 2 of three.
+    let a = WarpLine { ink: Some(Rect::new(100.0, 10.0, 300.0, 30.0)), extent: (100.0, 300.0), ref_y: 28.0 };
+    let b = WarpLine { ink: Some(Rect::new(100.0, 40.0, 300.0, 60.0)), extent: (100.0, 300.0), ref_y: 58.0 };
+    let c = WarpLine { ink: Some(Rect::new(100.0, 70.0, 300.0, 80.0)), extent: (100.0, 300.0), ref_y: 78.0 };
+    let m = w.mapper(&[a, b, c], rect());
+    let (top, bot) = (m.map(2, Point::new(200.0, 70.0)).y / H, m.map(2, Point::new(200.0, 80.0)).y / H);
+    // Band 2 runs from 0.4 to 1 at the centre; the line takes the middle fifth of it.
+    assert!((top - 0.64).abs() < 0.005 && (bot - 0.76).abs() < 0.005, "{top} {bot}");
     // A shorter first line keeps its share of the width.
     let short = WarpLine { ink: Some(Rect::new(150.0, 10.0, 250.0, 40.0)), extent: (150.0, 250.0), ref_y: 34.0 };
     let m = w.mapper(&[short, l2], rect());

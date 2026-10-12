@@ -4,7 +4,8 @@
 //! Text lines are shared out over the bands in order (the first ⌈n/k⌉ lines to the first band
 //! and so on). A band either
 //! - stretches its lines between a top and a bottom guide ([`Band::Fill`]): the ink box of the
-//!   band's lines fills the band vertically, and horizontally the text is scaled so that the
+//!   band's lines fills the band vertically (a band whose ink is shorter than the tallest band's
+//!   keeps the same scale, centred), and horizontally the text is scaled so that the
 //!   widest band is filled along the mean length of its guides (one scale for the whole text), or
 //! - sets its lines at their natural size along one guide ([`Band::Follow`], arches and circles):
 //!   glyphs keep their size, are placed by arc length (aligned as in the paragraph, the whole
@@ -658,6 +659,11 @@ impl Warp {
                 });
             }
         }
+        // Every fill band maps a box as tall as the tallest band's ink, centred on its own ink, so
+        // a band with fewer lines keeps them at the same size, centred between its guides.
+        let tallest = band_y.iter().flatten().map(|(y0, y1)| y1 - y0).fold(0.0, f64::max);
+        let band_y: Vec<Option<(f64, f64)>> =
+            band_y.iter().map(|r| r.map(|(y0, y1)| ((y0 + y1 - tallest) / 2.0, (y0 + y1 + tallest) / 2.0))).collect();
         for (b, band) in self.bands.iter().enumerate() {
             if let Band::Fill { top, bottom } = band {
                 let half = lines
