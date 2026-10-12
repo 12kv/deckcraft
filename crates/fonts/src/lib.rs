@@ -14,7 +14,9 @@ pub mod script;
 mod shape;
 
 pub use fallback::{bundled_families, covers_cluster, is_emoji_cluster, ligature_carets};
-pub use fontdb::{FALLBACK_FAMILY, FaceRef, FontDb, FontFace, LAST_RESORT_FAMILY, base_style, bundled, substitutes, system_font_dirs};
+pub use fontdb::{
+    FALLBACK_FAMILY, FaceRef, FontDb, FontFace, LAST_RESORT_FAMILY, MISSING_FONT_FAMILY, base_style, bundled, substitutes, system_font_dirs,
+};
 pub use harfrust::Feature;
 use harfrust::Tag;
 pub use kurbo::BezPath;
@@ -180,6 +182,20 @@ mod tests {
         let f = db.face("No Such Font Anywhere", "Regular");
         assert!(!f.family.is_empty());
         assert!(!shape(&f, "Hello", &[], |c| c).is_empty());
+    }
+
+    #[test]
+    fn missing_document_fonts_are_drawn_in_calibri() {
+        // PowerPoint draws a missing family in Calibri, whatever its panose or the theme says.
+        let db = FontDb::global();
+        for missing in ["Qqq Nonexistent", "Avenir Next Qqq", ""] {
+            let f = db.document_face(missing, "Bold");
+            assert_eq!(f.family, db.face(MISSING_FONT_FAMILY, "Bold").family, "{missing:?}");
+        }
+        // Metric-compatible stand-ins and DeckCraft's default keep their own fallbacks.
+        for kept in ["Arial", "Times New Roman", "Cambria", "Courier New", FALLBACK_FAMILY] {
+            assert_eq!(db.document_face(kept, "Regular").family, db.face(kept, "Regular").family, "{kept}");
+        }
     }
 
     #[test]

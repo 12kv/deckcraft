@@ -52,6 +52,19 @@ pub fn substitutes(family: &str) -> &'static [&'static str] {
     }
 }
 
+/// Families whose open substitutes ([`substitutes`]) keep their metrics, so text drawn with
+/// them breaks into the same lines.
+fn has_metric_twin(family: &str) -> bool {
+    matches!(
+        family.to_ascii_lowercase().as_str(),
+        "calibri" | "calibri light" | "cambria" | "cambria math" | "arial" | "helvetica" | "times new roman" | "times" | "courier new" | "courier"
+    )
+}
+
+/// The family PowerPoint draws a document's Latin text in when the font it names isn't installed,
+/// whatever the theme, `panose` or `pitchFamily` say.
+pub const MISSING_FONT_FAMILY: &str = "Calibri";
+
 #[derive(Clone)]
 enum FontBytes {
     Static(&'static [u8]),
@@ -754,6 +767,17 @@ impl FontDb {
             .or_else(|| self.find(FALLBACK_FAMILY, "Regular"))
             .or_else(|| self.read_faces().first().cloned())
             .unwrap_or_else(last_resort_face)
+    }
+
+    /// The face a document's text in `family` is drawn with, as PowerPoint draws it: the family
+    /// when it is installed or bundled, or a metric-compatible stand-in (Carlito for Calibri,
+    /// Liberation Sans for Arial…); any other missing family is drawn in Calibri (or Carlito).
+    /// DeckCraft's own default family keeps [`FontDb::face`]'s fallbacks.
+    pub fn document_face(&self, family: &str, style: &str) -> Arc<FontFace> {
+        if family.eq_ignore_ascii_case(FALLBACK_FAMILY) || has_metric_twin(family) || self.has_family(family) {
+            return self.face(family, style);
+        }
+        self.face(MISSING_FONT_FAMILY, style)
     }
 
     fn try_family(&self, family: &str, style: &str) -> Option<Arc<FontFace>> {
