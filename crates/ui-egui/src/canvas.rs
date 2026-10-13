@@ -513,13 +513,6 @@ fn overlays(app: &mut SlideApp, ui: &Ui, painter: &egui::Painter, xf: Xf, t: &To
             if blink && let Some((top, bot)) = deckcraft_engine::cmd::text::caret_line(st, ts) {
                 painter.line_segment([xf.to_screen(top), xf.to_screen(bot)], Stroke::new(1.5, t.caret));
             }
-
-            // After End on a wrapped line the caret is drawn at that line's end.
-            let aff = if ts.at_line_end() { deckcraft_text::Affinity::Upstream } else { deckcraft_text::Affinity::Downstream };
-            if blink && let Some((cx, top, bot)) = l.caret_drawn(deckcraft_text::Pos { para: ts.caret.0, ch: ts.caret.1 }, aff) {
-                let (p0, p1) = (xf.to_screen(m * Point::new(cx, top)), xf.to_screen(m * Point::new(cx, bot)));
-                painter.line_segment([p0, p1], Stroke::new(1.5, t.caret));
-            }
         }
     }
     // Table cell editing: outline the cell.

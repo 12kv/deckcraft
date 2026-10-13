@@ -197,7 +197,9 @@ pub fn caret_line(st: &DocState, t: &TextSel) -> Option<(deckcraft_geom::Point, 
         &body,
         &deckcraft_text::Opts { rect: geo.text_rect, fields: &deckcraft_text::NoFields, prompt_color: None, no_shrink: false },
     );
-    let (cx, top, bot) = l.caret(deckcraft_text::Pos { para: t.caret.0, ch: t.caret.1 })?;
+    // After End on a wrapped line the caret is drawn at that line's end.
+    let aff = if t.at_line_end() { deckcraft_text::Affinity::Upstream } else { deckcraft_text::Affinity::Downstream };
+    let (cx, top, bot) = l.caret_drawn(deckcraft_text::Pos { para: t.caret.0, ch: t.caret.1 }, aff)?;
     let m = deckcraft_render::text_transform(x.affine(), geo.text_rect, l.rotation);
     Some((m * deckcraft_geom::Point::new(cx, top), m * deckcraft_geom::Point::new(cx, bot)))
 }
