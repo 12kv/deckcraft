@@ -39,7 +39,6 @@ pub fn specs() -> Vec<CommandSpec> {
             commit
         ),
         cmd!(noundo "text.move", "Move Insertion Point", [], None, "{to: left|right|up|down|wordLeft|wordRight|lineStart|lineEnd|paraStart|paraEnd|start|end, extend?: bool}", has_text, move_caret),
-
         cmd!(
             "text.delete",
             "Delete Text",
