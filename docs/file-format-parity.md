@@ -1,6 +1,6 @@
 # File-format parity with PowerPoint
 
-> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-12 · **Change:** trivial (Groups with a small legacy child coordinate space draw outlines, dashes, arrowheads and ink at their own width (#233); previously major: created; formats taken from PowerPoint 16.113.4's Info.plist, PPTX coverage measured from `crates/pptx`) · **Target:** Microsoft PowerPoint for Mac 16.113 (Microsoft 365)
+> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-13 · **Change:** minor (paragraph default run properties fixed in fork); previous: trivial (Groups with a small legacy child coordinate space draw outlines, dashes, arrowheads and ink at their own width (#233); previously major: created; formats taken from PowerPoint 16.113.4's Info.plist, PPTX coverage measured from `crates/pptx`) · **Target:** Microsoft PowerPoint for Mac 16.113 (Microsoft 365)
 
 Every format PowerPoint reads or writes, DeckCraft's support, fidelity and how it is tested.
 Gaps are itemized in [gaps.md](gaps.md#file-formats). Dimension score: **~58% ready**
@@ -95,11 +95,21 @@ the round trip even though DeckCraft doesn't model it.
 2. The round-trip losses above (#70, #74, #77).
 3. SVG rendering, and clip regions inside EMF/WMF.
 
+
+### Fork regression fix: paragraph defaults (2026-10-13)
+
+PPTX paragraph default run properties (`a:pPr/a:defRPr`) now survive import/export and resolve below explicit runs but above list/master defaults; paragraph splitting preserves them. Regression tests cover partial/false overrides, breaks, fields, empty paragraphs, master fallback and old JSON. This resolves this import defect, not the broader font or corpus gaps.
+
 ## Revision history
 
 | Date | Change | Summary |
 |---|---|---|
+| 2026-10-13 | minor | Fixed paragraph default text style inheritance and round trip (fork); overall parity estimates unchanged |
 | 2026-10-12 | minor | EMF/WMF text and pattern brushes drawn; OLE (VML) and ActiveX previews read |
 | 2026-10-12 | minor | Text warps rendered; their adjust values read and written |
 | 2026-10-12 | trivial | Groups with a small legacy child coordinate space draw outlines, dashes, arrowheads and ink at their own width (#233) |
 | 2026-10-10 | major | Created from PowerPoint 16.113.4's `CFBundleDocumentTypes`, `crates/pptx` reader/writer and tests, and the open round-trip issues |
+
+### Fork validation (2026-10-13)
+
+The paragraph-default change passes 104 model/PPTX tests (including five new regression tests), scoped Clippy (`-p deckcraft-model -p deckcraft-pptx --lib -- -D warnings`), formatting, asset attribution, dependency layering and `cargo xtask wasm`. Tested with Rust 1.95.0. Full `cargo xtask ci` stops at the unchanged Matroska `crates/matroska/src/demux.rs:717` `clippy::collapsible_match` warning; therefore this is not a full-workspace CI pass.

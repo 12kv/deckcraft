@@ -647,8 +647,9 @@ fn run_text(w: &mut W, x: &mut Exp, o: &mut Out, text: &str, props: &RunProps) {
 
 pub fn paragraph(w: &mut W, x: &mut Exp, o: &mut Out, p: &Paragraph, math: bool, index: usize) {
     w.open0("a:p");
-    if p.level > 0 || !is_default_ppr(&p.props) {
-        ppr(w, x, o, "a:pPr", Some(p.level), &p.props, None);
+    let defaults = (p.default_run_props != RunProps::default()).then_some(&p.default_run_props);
+    if p.level > 0 || !is_default_ppr(&p.props) || defaults.is_some() {
+        ppr(w, x, o, "a:pPr", Some(p.level), &p.props, defaults);
     }
     for (ri, r) in p.runs.iter().enumerate() {
         match &r.kind {

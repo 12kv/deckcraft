@@ -284,6 +284,7 @@ pub fn level_style(ctx: &Ctx, shape: &Shape, level: u8) -> LevelStyle {
 /// Fully resolved run properties for `run` in paragraph `para` (explicit → paragraph style).
 pub fn run(ctx: &Ctx, shape: &Shape, para: &crate::text::Paragraph, run: &RunProps) -> RunProps {
     let mut r = run.clone();
+    r.inherit(&para.default_run_props);
     let lvl = level_style(ctx, shape, para.level);
     r.inherit(&lvl.run);
     // Hyperlinked text is drawn in the theme's hyperlink colour and underlined, as in PowerPoint,

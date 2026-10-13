@@ -1,6 +1,6 @@
 # Where DeckCraft falls short of PowerPoint
 
-> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-12 · **Change:** minor (IME composition and CJK interface text landed, #101; previous: minor, core-workflow alpha gate added; stage stays alpha; before that: major, first itemized gap list; full re-measure against PowerPoint for Mac 16.113.4 and the open GitHub issues) · **Target:** Microsoft PowerPoint for Mac 16.113 (Microsoft 365)
+> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-13 · **Change:** minor (paragraph default run properties fixed in fork); previous: minor (IME composition and CJK interface text landed, #101; previous: minor, core-workflow alpha gate added; stage stays alpha; before that: major, first itemized gap list; full re-measure against PowerPoint for Mac 16.113.4 and the open GitHub issues) · **Target:** Microsoft PowerPoint for Mac 16.113 (Microsoft 365)
 
 Every known shortfall, one entry each, ranked by how much it stops someone who presents with
 PowerPoint from switching. This is the work list: pick from the top. Numbers are summarized in
@@ -251,10 +251,16 @@ Detail in [localization-parity.md](localization-parity.md).
   services; an offline rule-based Designer is in the catalogue (P2). Local models (speech-to-text
   for subtitles, translation) need an owner decision on licensed models. 20–40 h.
 
+
+### Fork regression fix: paragraph defaults (2026-10-13)
+
+PPTX paragraph default run properties (`a:pPr/a:defRPr`) now survive import/export and resolve below explicit runs but above list/master defaults; paragraph splitting preserves them. Regression tests cover partial/false overrides, breaks, fields, empty paragraphs, master fallback and old JSON. This resolves this import defect, not the broader font or corpus gaps.
+
 ## Revision history
 
 | Date | Change | Summary |
 |---|---|---|
+| 2026-10-13 | minor | Fixed paragraph default text style inheritance and round trip (fork); overall parity estimates unchanged |
 | 2026-10-12 | minor | IME composition in slide text and notes, and CJK interface text with real glyphs (#101): the IME gap is now Korean on the web and table-cell underlines |
 | 2026-10-12 | minor | EMF/WMF text, pattern and hatch brushes drawn; legacy OLE and ActiveX previews shown; the SVG gap keeps only EMF clip regions |
 | 2026-10-12 | minor | Text warps render (all 40 presets, adjusts round-trip); the warp gap is now the gallery, command and handles |

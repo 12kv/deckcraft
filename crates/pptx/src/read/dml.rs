@@ -534,9 +534,10 @@ pub fn paragraph(imp: &mut Imp, part: &Part, p: &El) -> Paragraph {
     for e in p.elements() {
         match e.local() {
             "pPr" => {
-                let (lvl, pp, _) = ppr(imp, part, e);
+                let (lvl, pp, defaults) = ppr(imp, part, e);
                 para.level = lvl.unwrap_or(0);
                 para.props = pp;
+                para.default_run_props = defaults.unwrap_or_default();
             }
             "r" => {
                 let props = e.child("rPr").map(|r| rpr(imp, part, r)).unwrap_or_default();

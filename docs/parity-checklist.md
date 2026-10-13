@@ -139,7 +139,7 @@ Open P0 items: Start screen (new, templates/themes, recent), Contextual tabs (Sh
 | Arrange | Lock shapes | P2 | D |
 | Arrange | Alt text | P1 | D |
 | Text | In-place text editing (caret, selection, mouse, keyboard) | P0 | D |
-| Text | Font, size, bold, italic, underline, strikethrough (only Regular/Bold/Italic faces, #69) | P0 | P |
+| Text | Font, size, bold, italic, underline, strikethrough (paragraph defaults fixed 2026-10-13; only Regular/Bold/Italic faces, #69) | P0 | P |
 | Text | Font colour, highlight | P0 | D |
 | Text | Superscript, subscript, caps, character spacing | P1 | D |
 | Text | Change case, grow/shrink font, clear formatting | P1 | D |
@@ -233,3 +233,7 @@ Open P0 items: Start screen (new, templates/themes, recent), Contextual tabs (Sh
 | Platforms (✱) | macOS, Windows, Linux builds | P0 | P |
 | Platforms (✱) | Web (WASM) build | P1 | D |
 | Platforms (✱) | BSD build | P2 | P |
+
+## Fork revision history
+
+2026-10-13: paragraph default style regression fixed. Text formatting row reassessed and kept Partial; broader font-style limitations remain.

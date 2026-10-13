@@ -88,7 +88,13 @@ pub fn insert(body: &mut TextBody, pos: Pos, text: &str, props: Option<RunProps>
             let Some(p) = body.paragraphs.get_mut(pi) else { break };
             let idx = split_at(p, ch);
             let tail: Vec<Run> = p.runs.drain(idx..).collect();
-            let newp = Paragraph { level: p.level, props: p.props.clone(), runs: tail, end_props: p.end_props.clone() };
+            let newp = Paragraph {
+                level: p.level,
+                props: p.props.clone(),
+                default_run_props: p.default_run_props.clone(),
+                runs: tail,
+                end_props: p.end_props.clone(),
+            };
             p.end_props = props.clone();
             body.paragraphs.insert(pi + 1, newp);
             pi += 1;

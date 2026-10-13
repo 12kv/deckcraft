@@ -439,6 +439,9 @@ pub struct Paragraph {
     pub level: u8,
     #[serde(skip_serializing_if = "is_default_para")]
     pub props: ParaProps,
+    /// Paragraph-local default run properties (`a:pPr/a:defRPr`), below explicit runs.
+    #[serde(skip_serializing_if = "is_default_props")]
+    pub default_run_props: RunProps,
     pub runs: Vec<Run>,
     /// Properties of the paragraph end mark (used for an empty paragraph's caret).
     #[serde(skip_serializing_if = "is_default_props")]
