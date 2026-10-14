@@ -1,6 +1,6 @@
 # Where DeckCraft falls short of PowerPoint
 
-> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-13 · **Change:** minor (paragraph default run properties fixed in fork); previous: minor (IME composition and CJK interface text landed, #101; previous: minor, core-workflow alpha gate added; stage stays alpha; before that: major, first itemized gap list; full re-measure against PowerPoint for Mac 16.113.4 and the open GitHub issues) · **Target:** Microsoft PowerPoint for Mac 16.113 (Microsoft 365)
+> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-14 · **Change:** minor (Baimiao upstream sync preserving preview customizations); previous: minor (3-D bevel, camera and face lighting rendered; previous: minor, IME composition and CJK interface text landed, #101; previous: minor, core-workflow alpha gate added; stage stays alpha; before that: major, first itemized gap list; full re-measure against PowerPoint for Mac 16.113.4 and the open GitHub issues) · **Target:** Microsoft PowerPoint for Mac 16.113 (Microsoft 365)
 
 Every known shortfall, one entry each, ranked by how much it stops someone who presents with
 PowerPoint from switching. This is the work list: pick from the top. Numbers are summarized in
@@ -168,10 +168,11 @@ Detail in [animation-parity.md](animation-parity.md). 10–16 h; the pane is a *
 - **Evidence:** checklist rows "Edit points" (P1 missing), "Text warp transforms" (partial: all 40
   `prstTxWarp` presets render and their adjusts round-trip, but there is no Transform gallery or
   command to apply one, no adjust handles, and arc/circle placement can differ from PowerPoint by
-  1–3 % of the path length), "Bevel and 3-D rotation" (missing; `scene3d`/`sp3d` kept as raw XML on
-  round trip).
-- **Estimate:** 4–6 h (edit points), 2–4 h (warp gallery, command and handles), 8–12 h (3-D render
-  approximation).
+  1–3 % of the path length), "Bevel and 3-D rotation" (partial: bevels, camera presets and rotations and face lighting
+  render as approximations and `scene3d`/`sp3d` round-trip as raw XML; no extrusion or side faces,
+  only the three-point rig, and no command or pane to apply 3-D).
+- **Estimate:** 4–6 h (edit points), 2–4 h (warp gallery, command and handles), 6–10 h (3-D extrusion,
+  rigs and materials, Format Shape page).
 
 ### Proofing: spelling, thesaurus, AutoCorrect
 - **Evidence:** `review.spelling` checks a small built-in list of frequent misspellings
@@ -197,8 +198,8 @@ Detail in [ui-parity.md](ui-parity.md).
   blocker.**
 - **Format Shape pane thinner than PowerPoint's** (Fill/Line/Effects/Size/Text Box pages, picture
   and texture options, 3-D). 6–10 h. **Beta blocker.**
-- **First-run and start screen** (#17, #76: missing File overlay, broken layout; recent files and
-  templates thin). 3–5 h.
+- **File tab depth** (#76 landed the Backstage): no online templates, cloud places, printer
+  choice, video/GIF/CD exports or document protection. 4–8 h for the parts that need no cloud.
 - **Window chrome** (#71 macOS controls misaligned, #26 GNOME title bar, #41 system light/dark).
   2–4 h.
 - **Icon consistency across Craft apps** (#73, #56). 2–4 h; coordinate in craftrules.
@@ -261,8 +262,13 @@ PPTX paragraph default run properties (`a:pPr/a:defRPr`) now survive import/expo
 | Date | Change | Summary |
 |---|---|---|
 | 2026-10-13 | minor | Fixed paragraph default text style inheritance and round trip (fork); overall parity estimates unchanged |
+| 2026-10-13 | minor | Shape, picture and table rendering checked against PowerPoint on ~150 synthetic edge-case slides; 3-D bevels, cameras and face lighting now render approximately (gap narrowed to extrusion, rigs and the 3-D pane) |
 | 2026-10-12 | minor | IME composition in slide text and notes, and CJK interface text with real glyphs (#101): the IME gap is now Korean on the web and table-cell underlines |
 | 2026-10-12 | minor | EMF/WMF text, pattern and hatch brushes drawn; legacy OLE and ActiveX previews shown; the SVG gap keeps only EMF clip regions |
 | 2026-10-12 | minor | Text warps render (all 40 presets, adjusts round-trip); the warp gap is now the gallery, command and handles |
 | 2026-10-10 | minor | Noted that no gap blocks alpha (core-workflow gate passes) |
 | 2026-10-10 | major | Created: every gap from the 2026-10-10 re-measure and the 16 open GitHub issues, ranked, with beta blockers marked |
+
+### Baimiao sync validation (2026-10-14)
+
+The preview branch merges main `457406a7a5b62425e915926c8ccb0984e61a198c` and retains paragraph-local `a:defRPr` import, resolution, editing and export. Rust 1.95 Clippy compatibility uses equivalent match guards while preserving the dev-testkit layering exemption. Native font tests check their real platform preconditions: Symbol needs its Windows PUA mapping, and UI CJK fonts must fit the existing 48 MiB interface-font limit (this macOS Apple SD Gothic Neo collection is 53 MiB). No font budget is relaxed and no new assets are bundled. Browser preview tests in the Baimiao website remain responsible for the actual external-font runtime.

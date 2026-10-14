@@ -116,7 +116,8 @@ pub fn gradient(f: &El) -> Gradient {
     } else {
         GradientShape::Linear { angle: 90.0, scaled: false }
     };
-    Gradient { stops, shape, rotate_with_shape: f.bool("rotWithShape").unwrap_or(true) }
+    let tile = f.child("tileRect").map(|r| [pct(r, "l"), pct(r, "t"), pct(r, "r"), pct(r, "b")].map(|v| v.unwrap_or(0.0).clamp(-10.0, 10.0)));
+    Gradient { tile: tile.unwrap_or_default(), stops, shape, rotate_with_shape: f.bool("rotWithShape").unwrap_or(true) }
 }
 
 /// `blipFill` (either `a:` or `p:`) → picture fill, registering the image as media.
@@ -124,7 +125,7 @@ pub fn blip_fill(imp: &mut Imp, part: &Part, bf: &El) -> Option<PictureFill> {
     let blip = bf.child("blip");
     let media = blip.and_then(|b| media_ref(imp, part, b));
     let media = media?;
-    let mut pf = PictureFill { media, ..Default::default() };
+    let mut pf = PictureFill { media, upright: !bf.bool("rotWithShape").unwrap_or(true), ..Default::default() };
     if let Some(b) = blip {
         for e in b.elements() {
             match e.local() {
@@ -134,6 +135,8 @@ pub fn blip_fill(imp: &mut Imp, part: &Part, bf: &El) -> Option<PictureFill> {
                     pf.adjust.contrast = pct(e, "contrast").unwrap_or(0.0).clamp(-1.0, 1.0);
                 }
                 "grayscl" => pf.adjust.grayscale = true,
+                "biLevel" => pf.adjust.bilevel = Some(pct(e, "thresh").unwrap_or(0.5).clamp(0.0, 1.0)),
+                "alphaInv" => pf.adjust.alpha_inv = true,
                 "duotone" => {
                     let cs: Vec<ColorRef> = e.elements().filter_map(color_el).collect();
                     if let [a, b] = cs.as_slice() {
@@ -257,6 +260,14 @@ pub fn effects(el: &El) -> Effects {
             "innerShdw" => fx.inner_shadow = Some(shadow(e, true)),
             "glow" => fx.glow = Some(Glow { color: color(e).unwrap_or(ColorRef::rgb(Rgba::BLACK)), radius: pt(e, "rad").unwrap_or(0.0).max(0.0) }),
             "softEdge" => fx.soft_edge = Some(pt(e, "rad").unwrap_or(0.0).max(0.0)),
+            "fillOverlay" => {
+                let fill = e.elements().find_map(|f| match f.local() {
+                    "solidFill" => color(f).map(|c| Fill::Solid { color: c }),
+                    "gradFill" => Some(Fill::Gradient(gradient(f))),
+                    _ => None,
+                });
+                fx.fill_overlay = fill.map(|fill| deckcraft_model::style::FillOverlay { blend: e.attr("blend").unwrap_or("over").to_string(), fill });
+            }
             "reflection" => {
                 fx.reflection = Some(Reflection {
                     blur: pt(e, "blurRad").unwrap_or(0.0),
@@ -609,5 +620,13 @@ mod tests {
         assert_eq!(b.vert, Some(TextDir::Vertical270));
         assert_eq!(b.columns, Some(2));
         assert_eq!(b.autofit, Some(AutoFit::Shrink { font_scale: 0.625, line_reduction: 0.2 }));
+        // mongolianVert is its own direction (PowerPoint runs its lines left to right) and is
+        // written back as it was read.
+        let d = parse(br#"<a:bodyPr vert="mongolianVert"/>"#).unwrap();
+        let b = body_pr(&d.root);
+        assert_eq!(b.vert, Some(TextDir::MongolianVertical));
+        assert_eq!(b.vert.map(|v| v.xml()), Some("mongolianVert"));
+        let d = parse(br#"<a:bodyPr vert="wordArtVertRtl"/>"#).unwrap();
+        assert_eq!(body_pr(&d.root).vert.map(|v| v.xml()), Some("wordArtVertRtl"));
     }
 }
