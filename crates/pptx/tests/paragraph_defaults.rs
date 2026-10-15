@@ -36,7 +36,7 @@ fn check(pres: &Presentation) {
     let ctx = resolve::Ctx::for_slide(pres, slide).unwrap();
     let paras = &shape.text.as_ref().unwrap().paragraphs;
     let first = &paras[0];
-    assert_eq!(first.default_run_props.size, Some(28.0));
+    assert_eq!(first.def_props.size, Some(28.0));
     // Defaults are kept separately; explicit false values must not be lost or flattened.
     assert_eq!(first.runs[0].props, RunProps::default());
     let props = resolve::run(&ctx, shape, first, &first.runs[0].props);
@@ -45,7 +45,7 @@ fn check(pres: &Presentation) {
     assert_eq!(props.italic, Some(true)); // lower-priority list default still applies
     assert_eq!(props.font.as_deref(), Some("Inter"));
     assert_eq!(props.font_ea.as_deref(), Some("BIZ UDPGothic"));
-    assert_eq!(props.fill, first.default_run_props.fill);
+    assert_eq!(props.fill, first.def_props.fill);
     let override_props = resolve::run(&ctx, shape, first, &first.runs[1].props);
     assert_eq!(override_props.bold, Some(false));
     assert_eq!(override_props.italic, Some(false));
@@ -92,15 +92,15 @@ fn missing_properties_still_inherit_from_the_master() {
 fn splitting_a_paragraph_preserves_its_default_run_style() {
     let p = imported();
     let mut body = p.slides[0].shapes[0].text.clone().unwrap();
-    let defaults = body.paragraphs[0].default_run_props.clone();
+    let defaults = body.paragraphs[0].def_props.clone();
     edit::insert(&mut body, (0, 3), "\n", None);
-    assert_eq!(body.paragraphs[0].default_run_props, defaults);
-    assert_eq!(body.paragraphs[1].default_run_props, defaults);
+    assert_eq!(body.paragraphs[0].def_props, defaults);
+    assert_eq!(body.paragraphs[1].def_props, defaults);
 }
 
 #[test]
 fn old_serialized_paragraphs_default_to_no_run_override() {
     let p: Paragraph = serde_json::from_str(r#"{"runs":[]}"#).unwrap();
-    assert_eq!(p.default_run_props, RunProps::default());
+    assert_eq!(p.def_props, RunProps::default());
     assert!(!serde_json::to_string(&p).unwrap().contains("defaultRunProps"));
 }

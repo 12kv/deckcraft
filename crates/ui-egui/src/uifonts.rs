@@ -15,7 +15,7 @@ use std::sync::Arc;
 use deckcraft_fonts::{FontDb, FontFace};
 
 /// Faces larger than this are left out (egui keeps a copy of each face it is given).
-pub(super) const MAX_FACE_BYTES: usize = 48 << 20;
+pub(super) const MAX_FACE_BYTES: usize = 128 << 20;
 
 /// Faces borrowed for the interface, and the characters already looked at.
 #[derive(Default)]
