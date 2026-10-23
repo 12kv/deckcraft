@@ -133,6 +133,7 @@ app's JSON control channel (`deckcraft --control PORT`).
 |---|---|
 | 2026-10-20 | Baimiao fork: merge main `f34f412`; preserve paragraph-default, text and interface-font adaptations. Shared PDF writer and import fixes are included; standalone browser wrapper and runtime validation live in Baimiao PDF. |
 | 2026-10-18 | Native chart sidecar bytes move from JSON arrays into referenced ZIP entries, with shared media byte/item limits and bounded reads; older inline sidecars still load. Synthetic format regressions cover large workbooks and malformed members |
+| 2026-10-18 | Slide thumbnails and the Slide Sorter render only the slides in view: on a deck of more than 600 slides they used to evict their own thumbnails, so the pane flashed white and never finished (#969) |
 | 2026-10-17 | Opening a file caps absurd effect sizes (glow, soft edges, shadows, reflections, on shapes, text and table text) at what Format Shape allows: a glow of 10^18 pt in a .pptx made rendering ask for 34 GB and abort |
 | 2026-10-17 | Opening a .deckcraft file whose shapes repeat an id gives the repeats fresh ids (groups, layouts and masters too), so the deck validates and edits by id find one shape |
 | 2026-10-17 | Edit Points: turning a shape into a freeform is one undo step, so Undo brings the original shape back (it used to stay a freeform) |
@@ -209,6 +210,7 @@ app's JSON control channel (`deckcraft --control PORT`).
 | 2026-10-14 | Draw: pen pressure scales ink width when the pointer reports it (a mouse or a missing reading stays at the pen width; a stroke saved as a flat 0.5 still draws at the pen width). Tilt is not read |
 | 2026-10-13 | Saving a presentation keeps the embedded workbook behind an unchanged chart, and the chart part's relationships (#335). Editing the chart drops that workbook instead of writing numbers that no longer match it |
 | 2026-10-13 | A presentation whose object ids are used up refuses to grow instead of handing out duplicate ids (#407) |
+| 2026-10-13 | macOS: a Finder double-click, Open With, a drop on the Dock icon and `open -a DeckCraft deck.pptx` open the file (#138, #347). `Info.plist` now declares the documents DeckCraft opens (`.deckcraft`, `.pptx`, `.potx`, `.ppsx`, the same set as the Windows installer and the Linux desktop file, kept equal by a test), and the `kAEOpenDocuments` Apple event is handled through the pinned `fmv-macos-events` crate as in GridCraft; the `-psn_` argument older macOS adds on a Finder launch is ignored. PowerPoint stays the default until the user picks DeckCraft |
 
 | 2026-10-14 | Baimiao fork: merge synced main while preserving browser preview and font customizations; preview validation recorded in the website integration docs |
 | 2026-10-13 | PPTX paragraph defaults: font, size, colour and style inheritance; explicit run overrides and default styles preserved on export (fork) |
@@ -246,6 +248,7 @@ app's JSON control channel (`deckcraft --control PORT`).
 |---|---|---|
 | 2026-10-18 | minor | Native chart payloads use referenced ZIP members and share media byte/item limits; old inline sidecars remain readable. Synthetic tests cover multi-megabyte layout, all shape owners, shared budgets, missing/corrupt members and invalid references. Scores and milestone scope unchanged |
 | 2026-10-15 | trivial | Progress log: chart package parts survive a native save. Scores and milestone names unchanged |
+| 2026-10-18 | trivial | Progress log: thumbnails of huge decks render only the slides in view (#969) |
 | 2026-10-15 | trivial | Progress log: PPTX trigger click-step round trip. Feature scores and milestone names unchanged |
 | 2026-10-16 | trivial | Progress log: PNG export with a transparent background (#784) |
 | 2026-10-16 | trivial | Progress log: a `.ppsx` from the system starts the slide show (#862) |
@@ -302,6 +305,7 @@ app's JSON control channel (`deckcraft --control PORT`).
 | 2026-10-13 | trivial | Progress log: Grid Options dialog |
 | 2026-10-14 | trivial | Progress log: pen pressure scales ink width |
 | 2026-10-13 | trivial | Progress log: chart workbook round-trip (#335) |
+| 2026-10-13 | trivial | Progress log: Finder opens presentations on macOS (#138) |
 
 | 2026-10-13 | minor | Fixed paragraph default text style inheritance and round trip (fork); overall parity estimates unchanged |
 | 2026-10-13 | trivial | Progress log: wild text cases |
@@ -315,3 +319,7 @@ app's JSON control channel (`deckcraft --control PORT`).
 | 2026-10-10 | minor | Stage checked against the new core-workflow gate: passes, stays alpha |
 | 2026-10-10 | major | Restructured to craftrules `standards/progress-docs.md`: stage, two numbers, dimensions, features, languages; parity estimate moved to docs/target-app-parity.md, "Working today" to its evidence section, the alpha checklist to docs/roadmap.md |
 | 2026-10-07 | major | Alpha checklist (~80% to a self-defined alpha), breadth ~80%, overall ~62%, ~190 h to full parity |
+
+## Baimiao browser preview sync (2026-10-23)
+
+Merged fork main `b47195feec0f0fe4220d8943ad1c8add5dad8072`. Preserved paragraph default style handling and the conversion integration. Browser wrapper and symbol-font patch remain maintained in the Baimiao website; updated empty-line metrics and OPC target resolution come from upstream.
